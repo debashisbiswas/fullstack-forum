@@ -16,29 +16,12 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	default: async (event) => {
-		// TODO: This code is repeated with the other form.
+		// TODO: superform
 		const formData = await event.request.formData();
-		const username = formData.get('username');
-		const password = formData.get('password');
+		const username = formData.get('username') as string;
+		const password = formData.get('password') as string;
 
-		if (
-			typeof username !== 'string' ||
-			username.length < 3 ||
-			username.length > 31 ||
-			!/^[a-z0-9_-]+$/.test(username)
-		) {
-			return fail(400, {
-				message: 'Invalid username'
-			});
-		}
-
-		if (typeof password !== 'string' || password.length < 6 || password.length > 255) {
-			return fail(400, {
-				message: 'Invalid password'
-			});
-		}
-
-		// TODO: use OWASP flow here for consistent timing
+		// TODO: use OWASP flow here for consistent timing?
 		const existingUser = await db.query.userTable.findFirst({
 			where: eq(userTable.username, username)
 		});

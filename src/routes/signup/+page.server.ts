@@ -41,12 +41,6 @@ export const actions: Actions = {
 		const hashedPassword = await new Argon2id().hash(password);
 		const userId = generateId(15);
 
-		console.log({
-			id: userId,
-			username,
-			password: hashedPassword
-		});
-
 		try {
 			await db.insert(userTable).values({
 				id: userId,
