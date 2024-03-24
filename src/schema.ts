@@ -13,3 +13,12 @@ export const sessionTable = sqliteTable('session', {
 		.references(() => userTable.id),
 	expiresAt: integer('expires_at').notNull()
 });
+
+export const postTable = sqliteTable('post', {
+	id: integer('id').notNull().primaryKey({ autoIncrement: true }),
+	owner: text('user_id')
+		.notNull()
+		.references(() => userTable.id),
+	title: text('title').notNull(),
+	content: text('content').notNull()
+});

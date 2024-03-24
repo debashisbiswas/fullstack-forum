@@ -1,13 +1,16 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { lucia } from '$lib/server/auth';
+import { db } from '$lib/server/db';
 
-export const load: PageServerLoad = ({ locals }) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
 		return redirect(302, '/login');
 	}
 
-	return { user: locals.user };
+	const posts = await db.query.postTable.findMany();
+
+	return { user: locals.user, posts };
 };
 
 export const actions: Actions = {
