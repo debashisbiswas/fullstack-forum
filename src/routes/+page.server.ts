@@ -2,13 +2,19 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { lucia } from '$lib/server/auth';
 import { db } from '$lib/server/db';
+import { postTable, userTable } from '../schema';
+import { desc, eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
 		return redirect(302, '/login');
 	}
 
-	const posts = await db.query.postTable.findMany();
+	const posts = await db
+		.select()
+		.from(postTable)
+		.innerJoin(userTable, eq(postTable.owner, userTable.id))
+		.orderBy(desc(postTable.id));
 
 	return { user: locals.user, posts };
 };

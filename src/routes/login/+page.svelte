@@ -5,6 +5,7 @@
 </script>
 
 <h1>Sign in</h1>
+
 <form method="post" use:enhance>
 	<label for="username">Username</label>
 	<input type="text" name="username" id="username" />
