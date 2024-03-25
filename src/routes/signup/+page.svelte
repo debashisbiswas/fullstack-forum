@@ -20,4 +20,4 @@
 	<p>{form?.message ?? ''}</p>
 </form>
 
-<a href="/login">Sign in</a>
+<a href="/login">Log in</a>

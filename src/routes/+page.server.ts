@@ -6,17 +6,13 @@ import { postTable, userTable } from '../schema';
 import { desc, eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!locals.user) {
-		return redirect(302, '/login');
-	}
-
-	const posts = await db
+	const allPosts = await db
 		.select()
 		.from(postTable)
 		.innerJoin(userTable, eq(postTable.owner, userTable.id))
 		.orderBy(desc(postTable.id));
 
-	return { user: locals.user, posts };
+	return { user: locals.user, allPosts };
 };
 
 export const actions: Actions = {

@@ -8,18 +8,24 @@
 		<li><strong>Fullstack Forum</strong></li>
 	</ul>
 	<ul>
-		<li>{data.user.username}</li>
-		<form method="post" use:enhance>
-			<li>
-				<button>Sign out</button>
-			</li>
-		</form>
+		{#if data.user}
+			<li>{data.user.username}</li>
+			<form method="post" use:enhance>
+				<li>
+					<button>Sign out</button>
+				</li>
+			</form>
+		{:else}
+			<a href="/login">Log in</a>
+		{/if}
 	</ul>
 </nav>
 
-<a href="/new">Create new post</a>
+{#if data.user}
+	<a href="/new">Create new post</a>
+{/if}
 
-{#each data.posts as { user, post }}
+{#each data.allPosts as { user, post }}
 	<article>
 		<h2>{post.title}</h2>
 		<p>{user.username}</p>
