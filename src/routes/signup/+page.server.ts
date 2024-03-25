@@ -1,50 +1,48 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { Argon2id } from 'oslo/password';
-import { Lucia, generateId } from 'lucia';
+import { generateId } from 'lucia';
 import { db } from '$lib/server/db';
 import { userTable } from '../../schema';
 import { lucia } from '$lib/server/auth';
+import { message, superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { z } from 'zod';
+
+const signupSchema = z.object({
+	username: z
+		.string()
+		.min(3)
+		.max(32)
+		.trim()
+		.refine((val) => /^[a-z0-9_-]+$/.test(val)),
+	password: z.string().min(6).max(256)
+});
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
 		return redirect(302, '/');
 	}
 
-	return {};
+	const form = await superValidate(zod(signupSchema));
+	return { form };
 };
 
 export const actions: Actions = {
 	default: async (event) => {
-		// TODO: superform
-		const formData = await event.request.formData();
-		const username = formData.get('username');
-		const password = formData.get('password');
+		const form = await superValidate(event.request, zod(signupSchema));
 
-		if (
-			typeof username !== 'string' ||
-			username.length < 3 ||
-			username.length > 31 ||
-			!/^[a-z0-9_-]+$/.test(username)
-		) {
-			return fail(400, {
-				message: 'Invalid username'
-			});
+		if (!form.valid) {
+			return fail(400, { form });
 		}
 
-		if (typeof password !== 'string' || password.length < 6 || password.length > 255) {
-			return fail(400, {
-				message: 'Invalid password'
-			});
-		}
-
-		const hashedPassword = await new Argon2id().hash(password);
+		const hashedPassword = await new Argon2id().hash(form.data.password);
 		const userId = generateId(15);
 
 		try {
 			await db.insert(userTable).values({
 				id: userId,
-				username,
+				username: form.data.username,
 				password: hashedPassword
 			});
 
@@ -58,9 +56,7 @@ export const actions: Actions = {
 			// TODO: is there actually a good way to handle the conflict here?
 			console.error(e);
 
-			return fail(500, {
-				message: 'Error occured'
-			});
+			return message(form, 'Error occured', { status: 500 });
 		}
 
 		return redirect(302, '/');

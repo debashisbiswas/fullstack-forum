@@ -5,37 +5,43 @@ import { userTable } from '../../schema';
 import { eq } from 'drizzle-orm';
 import { Argon2id } from 'oslo/password';
 import { lucia } from '$lib/server/auth';
+import { message, superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+	username: z.string(),
+	password: z.string()
+});
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
 		return redirect(302, '/');
 	}
 
-	return {};
+	const form = await superValidate(zod(loginSchema));
+	return { form };
 };
 
 export const actions: Actions = {
 	default: async (event) => {
-		// TODO: superform
-		const formData = await event.request.formData();
-		const username = formData.get('username') as string;
-		const password = formData.get('password') as string;
+		const form = await superValidate(event.request, zod(loginSchema));
+
+		if (!form.valid) {
+			return fail(400, { form });
+		}
 
 		// TODO: use OWASP flow here for consistent timing?
 		const existingUser = await db.query.userTable.findFirst({
-			where: eq(userTable.username, username)
+			where: eq(userTable.username, form.data.username)
 		});
 		if (!existingUser) {
-			return fail(400, {
-				message: 'Incorrect username or password'
-			});
+			return message(form, 'Incorrect username or password', { status: 400 });
 		}
 
-		const validPassword = await new Argon2id().verify(existingUser.password, password);
+		const validPassword = await new Argon2id().verify(existingUser.password, form.data.password);
 		if (!validPassword) {
-			return fail(400, {
-				message: 'Incorrect username or password'
-			});
+			return message(form, 'Incorrect username or password', { status: 400 });
 		}
 
 		const session = await lucia.createSession(existingUser.id, {});
