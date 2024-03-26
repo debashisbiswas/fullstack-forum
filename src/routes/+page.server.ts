@@ -7,7 +7,11 @@ import { desc, eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const allPosts = await db
-		.select()
+		.select({
+			id: postTable.id,
+			title: postTable.title,
+			author: userTable.username
+		})
 		.from(postTable)
 		.innerJoin(userTable, eq(postTable.owner, userTable.id))
 		.orderBy(desc(postTable.id));

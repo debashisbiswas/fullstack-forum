@@ -25,10 +25,11 @@
 	<a href="/new">Create new post</a>
 {/if}
 
-{#each data.allPosts as { user, post }}
+{#each data.allPosts as { id, title, author }}
 	<article>
-		<h2>{post.title}</h2>
-		<p>{user.username}</p>
+		<h2>{title}</h2>
+		<p>{author}</p>
+		<a href="/read/{id}">Read</a>
 	</article>
 {:else}
 	<h2>No posts!</h2>
