@@ -16,7 +16,12 @@
 				</li>
 			</form>
 		{:else}
-			<a href="/login">Log in</a>
+			<li>
+				<a href="/signup">Create account</a>
+			</li>
+			<li>
+				<a href="/login">Log in</a>
+			</li>
 		{/if}
 	</ul>
 </nav>
@@ -25,11 +30,11 @@
 	<a href="/new">Create new post</a>
 {/if}
 
-{#each data.allPosts as { id, title, author }}
+{#each data.allPosts as post}
 	<article>
-		<h2>{title}</h2>
-		<p>{author}</p>
-		<a href="/read/{id}">Read</a>
+		<h2>{post.title}</h2>
+		<p>{post.username}</p>
+		<a href="/read/{post.id}">Read</a>
 	</article>
 {:else}
 	<h2>No posts!</h2>

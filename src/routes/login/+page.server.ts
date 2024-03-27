@@ -1,13 +1,11 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
-import { userTable } from '../../schema';
-import { eq } from 'drizzle-orm';
 import { Argon2id } from 'oslo/password';
-import { lucia } from '$lib/server/auth';
+import { lucia } from '$lib/server/db';
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
+import { db } from '$lib/server/db';
 
 const loginSchema = z.object({
 	username: z.string(),
@@ -32,9 +30,11 @@ export const actions: Actions = {
 		}
 
 		// TODO: use OWASP flow here for consistent timing?
-		const existingUser = await db.query.userTable.findFirst({
-			where: eq(userTable.username, form.data.username)
-		});
+		const existingUser = await db
+			.selectFrom('user')
+			.selectAll()
+			.where('user.username', '=', form.data.username)
+			.executeTakeFirst();
 		if (!existingUser) {
 			return message(form, 'Incorrect username or password', { status: 400 });
 		}

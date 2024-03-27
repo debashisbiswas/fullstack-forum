@@ -22,3 +22,14 @@ export const postTable = sqliteTable('post', {
 	title: text('title').notNull(),
 	content: text('content').notNull()
 });
+
+export const replyTable = sqliteTable('reply', {
+	id: integer('id').notNull().primaryKey({ autoIncrement: true }),
+	owner: text('user_id')
+		.notNull()
+		.references(() => userTable.id),
+	parentPost: integer('parent_post')
+		.notNull()
+		.references(() => postTable.id),
+	content: text('content').notNull()
+});

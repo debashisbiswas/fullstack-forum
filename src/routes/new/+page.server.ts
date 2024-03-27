@@ -1,7 +1,6 @@
-import { db } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
-import { postTable } from '../../schema';
 import type { Actions, PageServerLoad } from './$types';
+import { db } from '$lib/server/db';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
@@ -21,11 +20,14 @@ export const actions: Actions = {
 		const title = formData.get('title') as string;
 		const content = formData.get('content') as string;
 
-		await db.insert(postTable).values({
-			owner: session.userId,
-			title,
-			content
-		});
+		await db
+			.insertInto('post')
+			.values({
+				user_id: session.userId,
+				title,
+				content
+			})
+			.execute();
 
 		return redirect(303, '/');
 	}

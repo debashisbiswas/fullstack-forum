@@ -2,12 +2,11 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { Argon2id } from 'oslo/password';
 import { generateId } from 'lucia';
-import { db } from '$lib/server/db';
-import { userTable } from '../../schema';
-import { lucia } from '$lib/server/auth';
+import { lucia } from '$lib/server/db';
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
+import { db } from '$lib/server/db';
 
 const signupSchema = z.object({
 	username: z
@@ -40,11 +39,14 @@ export const actions: Actions = {
 		const userId = generateId(15);
 
 		try {
-			await db.insert(userTable).values({
-				id: userId,
-				username: form.data.username,
-				password: hashedPassword
-			});
+			await db
+				.insertInto('user')
+				.values({
+					id: userId,
+					username: form.data.username,
+					password: hashedPassword
+				})
+				.execute();
 
 			const session = await lucia.createSession(userId, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);

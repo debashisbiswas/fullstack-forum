@@ -1,20 +1,15 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { lucia } from '$lib/server/auth';
+import { lucia } from '$lib/server/db';
 import { db } from '$lib/server/db';
-import { postTable, userTable } from '../schema';
-import { desc, eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const allPosts = await db
-		.select({
-			id: postTable.id,
-			title: postTable.title,
-			author: userTable.username
-		})
-		.from(postTable)
-		.innerJoin(userTable, eq(postTable.owner, userTable.id))
-		.orderBy(desc(postTable.id));
+		.selectFrom('post')
+		.innerJoin('user', 'post.user_id', 'user.id')
+		.select(['post.id', 'post.title', 'user.username'])
+		.orderBy('post.id', 'desc')
+		.execute();
 
 	return { user: locals.user, allPosts };
 };
@@ -32,7 +27,5 @@ export const actions: Actions = {
 			path: '.',
 			...sessionCookie.attributes
 		});
-
-		return redirect(302, '/login');
 	}
 };

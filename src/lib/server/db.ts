@@ -1,7 +1,40 @@
-import { createClient } from '@libsql/client';
-import { drizzle } from 'drizzle-orm/libsql';
-import * as schema from '../../schema';
+import { Lucia } from 'lucia';
+import { dev } from '$app/environment';
 
-const sqliteDB = createClient({ url: 'file:data.db' });
+import { BetterSqlite3Adapter } from '@lucia-auth/adapter-sqlite';
+import SQLite from 'better-sqlite3';
+import { Kysely, SqliteDialect } from 'kysely';
+import type { DB, user } from './dbgenerated/types';
 
-export const db = drizzle(sqliteDB, { schema: { ...schema } });
+const database = new SQLite('data.db');
+
+const adapter = new BetterSqlite3Adapter(database, {
+	user: 'user',
+	session: 'session'
+});
+
+export const db = new Kysely<DB>({
+	dialect: new SqliteDialect({
+		database
+	})
+});
+
+export const lucia = new Lucia(adapter, {
+	sessionCookie: {
+		attributes: {
+			secure: !dev
+		}
+	},
+	getUserAttributes: (attributes) => {
+		return {
+			username: attributes.username
+		};
+	}
+});
+
+declare module 'lucia' {
+	interface Register {
+		Lucia: typeof lucia;
+		DatabaseUserAttributes: user;
+	}
+}
