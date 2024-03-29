@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { Argon2id } from 'oslo/password';
 import { lucia } from '$lib/server/db';
@@ -6,6 +6,7 @@ import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { db } from '$lib/server/db';
+import { redirect } from 'sveltekit-flash-message/server';
 
 const loginSchema = z.object({
 	username: z.string(),
@@ -51,6 +52,11 @@ export const actions: Actions = {
 			...sessionCookie.attributes
 		});
 
-		return redirect(302, '/');
+		return redirect(
+			302,
+			'/',
+			{ type: 'success', message: `Welcome, ${existingUser.username}!` },
+			event
+		);
 	}
 };

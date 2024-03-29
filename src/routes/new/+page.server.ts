@@ -29,6 +29,6 @@ export const actions: Actions = {
 			})
 			.execute();
 
-		return redirect(303, '/');
+		redirect(303, '/');
 	}
 };

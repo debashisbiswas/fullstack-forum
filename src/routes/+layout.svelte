@@ -1,10 +1,37 @@
 <script lang="ts">
 	import '../app.pcss';
 	import { enhance } from '$app/forms';
-	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
+	import { AppShell, AppBar, Toast } from '@skeletonlabs/skeleton';
+	import { initializeStores } from '@skeletonlabs/skeleton';
+	import { getFlash } from 'sveltekit-flash-message';
+	import { page } from '$app/stores';
+
+	initializeStores();
 
 	export let data;
+
+	import { getToastStore } from '@skeletonlabs/skeleton';
+
+	const toastStore = getToastStore();
+
+	const flash = getFlash(page);
+
+	$: if ($flash) {
+		switch ($flash.type) {
+			case 'success':
+				toastStore.trigger({
+					message: $flash.message,
+					background: 'variant-filled-success'
+				})
+				break;
+
+			default:
+				break;
+		}
+	}
 </script>
+
+<Toast />
 
 <AppShell>
 	<svelte:fragment slot="header">
