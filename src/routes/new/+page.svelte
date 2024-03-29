@@ -1,13 +1,13 @@
 <form method="post">
-	<label for="title">Title</label>
-	<input type="text" name="title" id="title" />
+	<label class="label" for="title">Title</label>
+	<input class="input" type="text" name="title" id="title" />
 
 	<br />
 
 	<label for="content">Content</label>
-	<textarea name="content" id="content"></textarea>
+	<textarea class="textarea" name="content" id="content"></textarea>
 
 	<br />
 
-	<button>Create</button>
+	<button class="btn variant-filled-primary">Create</button>
 </form>

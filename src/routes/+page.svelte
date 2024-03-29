@@ -1,40 +1,17 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	export let data;
 </script>
 
-<nav class="container">
-	<ul>
-		<li><strong>Fullstack Forum</strong></li>
-	</ul>
-	<ul>
-		{#if data.user}
-			<li>{data.user.username}</li>
-			<form method="post" use:enhance>
-				<li>
-					<button>Sign out</button>
-				</li>
-			</form>
-		{:else}
-			<li>
-				<a href="/signup">Create account</a>
-			</li>
-			<li>
-				<a href="/login">Log in</a>
-			</li>
-		{/if}
-	</ul>
-</nav>
-
 {#if data.user}
-	<a href="/new">Create new post</a>
+	<a href="/new" class="variant-filled-primary btn text-center my-4">Create new post</a>
 {/if}
 
 {#each data.allPosts as post}
-	<article>
-		<h2>{post.title}</h2>
-		<p>{post.username}</p>
-		<a href="/read/{post.id}">Read</a>
+	<article class="card card-hover p-4 mt-4">
+		<a href="/read/{post.id}">
+			<header class="card-header text-2xl font-bold tracking-tight">{post.title}</header>
+			<section class="p-4">{post.username}</section>
+		</a>
 	</article>
 {:else}
 	<h2>No posts!</h2>

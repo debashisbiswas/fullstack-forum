@@ -6,26 +6,24 @@
 	const { form, enhance, message } = superForm(data.form);
 </script>
 
-<a href="/">Home</a>
+<h1 class="h1">{data.post.title}</h1>
 
-<h1>{data.post.title}</h1>
-
-<article>
-	<p>{data.post.username}:</p>
-	<p>{data.post.content}</p>
+<article class="card m-4">
+	<header class="card-header">{data.post.username}</header>
+	<section class="p-4 paragraph">{data.post.content}</section>
 </article>
 
 {#each data.replies as reply}
-	<article>
-		<p>{reply.username}:</p>
-		<p>{reply.content}</p>
+	<article class="card m-4">
+		<header class="card-header">{reply.username}</header>
+		<section class="p-4 paragraph">{reply.content}</section>
 	</article>
 {/each}
 
 {#if data.user}
-	<form method="post" use:enhance>
-		<textarea name="replycontent" id="replycontent" bind:value={$form.replycontent}></textarea>
-		<button>Add reply</button>
+	<form class="m-4" method="post" use:enhance>
+		<textarea class="textarea" name="replycontent" id="replycontent" bind:value={$form.replycontent}></textarea>
+		<button class="btn variant-filled-primary">Add reply</button>
 		{#if $message}
 			<p>{$message}</p>
 		{/if}

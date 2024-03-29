@@ -1,9 +1,7 @@
-import { fail } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
-import { lucia } from '$lib/server/db';
+import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async () => {
 	const allPosts = await db
 		.selectFrom('post')
 		.innerJoin('user', 'post.user_id', 'user.id')
@@ -11,21 +9,5 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.orderBy('post.id', 'desc')
 		.execute();
 
-	return { user: locals.user, allPosts };
-};
-
-export const actions: Actions = {
-	default: async ({ cookies, locals }) => {
-		if (!locals.session) {
-			return fail(401);
-		}
-
-		await lucia.invalidateSession(locals.session.id);
-		const sessionCookie = lucia.createBlankSessionCookie();
-
-		cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
-			...sessionCookie.attributes
-		});
-	}
+	return { allPosts };
 };

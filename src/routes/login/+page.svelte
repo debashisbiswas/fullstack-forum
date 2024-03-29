@@ -6,11 +6,12 @@
 	const { form, errors, constraints, message, enhance } = superForm(data.form);
 </script>
 
-<h1>Log in</h1>
+<h1 class="h1 my-8">Log in</h1>
 
 <form method="post" use:enhance>
-	<label for="username">Username</label>
+	<label class="label" for="username">Username</label>
 	<input
+		class="input"
 		type="text"
 		name="username"
 		id="username"
@@ -22,8 +23,9 @@
 
 	<br />
 
-	<label for="password">Password</label>
+	<label class="label" for="password">Password</label>
 	<input
+		class="input"
 		type="password"
 		name="password"
 		id="password"
@@ -35,8 +37,8 @@
 
 	<br />
 
-	<button>Log in</button>
+	<button class="btn variant-filled-primary">Log in</button>
 	{#if $message}<p>{$message}</p>{/if}
 </form>
 
-<a href="/signup">Create an account</a>
+<a href="/signup" class="anchor">Create an account</a>
